@@ -1,0 +1,85 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator nestgraphql {
+  provider           = "prisma-nestjs-graphql"
+  output             = "../src/@generated/nestgraphql"
+  noTypeId           = true
+  noAtomicOperations = true
+}
+
+model Account {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email        String        @unique
+  /// @HideField()
+  passwordHash String
+  roles        AccountRole[]
+  status       AccountStatus
+
+  avatarUrl String?
+
+  sessions AccountSession[]
+}
+
+enum AccountStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum AccountRole {
+  ADMIN
+  USER
+}
+
+model OneTimeCode {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  email     String   @unique
+  code      String
+  expiresAt DateTime
+}
+
+model Upload {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  filepath         String @unique
+  originalFilename String
+  extension        String
+  size             Int
+  mimetype         String
+
+  uploaderIp String
+}
+
+model AccountSession {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account   Account @relation(fields: [accountId], references: [id])
+  accountId Int
+
+  /// @HideField()
+  token String @unique
+
+  ipAddr    String
+  userAgent String?
+  expiresAt DateTime
+}
