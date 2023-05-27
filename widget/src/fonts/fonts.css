@@ -1,0 +1,12 @@
+@font-face {
+    font-family: Gilroy;
+    font-weight: 400;
+    src: url('Gilroy-Medium.woff') format("woff");
+    font-display: swap;
+}
+@font-face {
+    font-family: Gilroy;
+    font-weight: 700;
+    src: url('GilroyBold.woff') format("woff");
+    font-display: swap;
+}

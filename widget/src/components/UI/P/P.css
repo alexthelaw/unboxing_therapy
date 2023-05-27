@@ -1,0 +1,61 @@
+.xs {
+	font-size: 12px;
+	line-height: 20px;
+}
+.s {
+	font-size: 14px;
+	line-height: 20px;
+}
+.m {
+	font-size: 16px;
+	line-height: 20px;
+}
+.l {
+	font-size: 20px;
+	line-height: 26px;
+}
+.xl {
+	font-size: 24px;
+	line-height: 32px;
+}
+.regular {
+	font-weight: 400;
+}
+.semibold {
+	font-weight: 500;
+}
+.bold {
+	font-weight: 700;
+}
+.regularCase {
+	text-transform: none;
+}
+.uppercase {
+	text-transform: uppercase;
+}
+.gold_text {
+	color: rgb(var(--gold));
+}
+
+@media screen and (max-width: 600px){
+	.xs {
+		font-size: 10px;
+		line-height: 20px;
+	}
+	.s {
+		font-size: 12px;
+		line-height: 20px;
+	}
+	.m {
+		font-size: 14px;
+		line-height: 20px;
+	}
+	.l {
+		font-size: 16px;
+		line-height: 20px;
+	}
+	.xl {
+		font-size: 20px;
+		line-height: 26px;
+	}
+}

@@ -1,0 +1,36 @@
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: start;
+    gap: 8px;
+    overflow: auto;
+    padding: 0 24px 60px 24px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.container::-webkit-scrollbar {
+    display: none;
+}
+.green_text {
+    color: #4DC9AC;
+}
+
+.qr_code_wrapper {
+    margin-top: 40px;
+    align-self: center;
+    width: 110px;
+    height: 110px;
+    background: white;
+    border-radius: 10px;
+    display: grid;
+    place-content: center;
+    padding: 10px;
+}
+
+.qr_code_wrapper img {
+    width: 100px;
+    height: 100px;
+}
