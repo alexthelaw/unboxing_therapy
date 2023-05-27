@@ -19,7 +19,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
     Counters.Counter private _tokenIdCounter;
 
     address public admin;
-    uint256 public unboxPrice = 20 ether;
+    uint256 public unboxPrice = 19 ether;
 
     constructor(
         address admin_
@@ -102,46 +102,27 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return generateRandomElement(elements);
     }
 
-    function sendRandomToken(address to) public payable onlyAdmin returns (uint256, uint256, uint256) {
+    function sendRandomToken(address to) public payable onlyAdmin returns (uint256) {
         require(msg.value >= unboxPrice, "Not enough money");
 
-        uint256 tokenId1 = 0;
-        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+        uint256 max = _tokenIdCounter.current();
+        for (uint256 i = 0; i < max; i++) {
+            if (max >= 1000) {
+                revert("Too many attempts");
+            }
             if (!isUnboxed[i]) {
                 uint256 tokenId = generateRandomTokenId();
                 safeTransferFrom(msg.sender, to, tokenId);
                 isUnboxed[tokenId] = true;
                 probabilities[tokenId] = 0;
-                tokenId1 = tokenId;
+                return tokenId;
+            } else {
+                max++;
+                break;
             }
         }
-        require(tokenId1 != 0, "No tokens left [1]");
 
-        uint256 tokenId2 = 0;
-        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-            if (!isUnboxed[i]) {
-                uint256 tokenId = generateRandomTokenId();
-                safeTransferFrom(msg.sender, to, tokenId);
-                isUnboxed[tokenId] = true;
-                probabilities[tokenId] = 0;
-                tokenId2 = tokenId;
-            }
-        }
-        require(tokenId2 != 0, "No tokens left [1]");
-
-        uint256 tokenId3 = 0;
-        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-            if (!isUnboxed[i]) {
-                uint256 tokenId = generateRandomTokenId();
-                safeTransferFrom(msg.sender, to, tokenId);
-                isUnboxed[tokenId] = true;
-                probabilities[tokenId] = 0;
-                tokenId3 = tokenId;
-            }
-        }
-        require(tokenId3 != 0, "No tokens left [1]");
-
-        return (tokenId1, tokenId2, tokenId3);
+        revert("No more tokens to unbox");
     }
 
     function setAdmin(address admin_) public onlyAdmin {
