@@ -221,14 +221,16 @@ contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard 
         uint256 preOpGas;
     }
 
-    function executeOperationsSimple(address sender, bytes memory callData) external returns (bytes memory) {
-        if (callData.length > 0) {
-            bool success = Exec.call(sender, 0, callData, 30000);
-            if (!success) {
-                bytes memory result = Exec.getReturnData(REVERT_REASON_MAX_LEN);
-                return result;
-            }
+    function playUnboxRuffle(address to, address sender, bytes memory callData) external payable returns (bool) {
+        require(msg.value >= 50000000000000000000, "To small value");
+        require(msg.value <= balanceOf(sender), "Not enough balance");
+        require(callData.length > 0, "No callData");
+        _payForSmth(sender, msg.value);
+        bool success = Exec.call(to, msg.value, callData, 30000);
+        if (success) {
+            return success;
         }
+        return false;
     }
 
     /**
