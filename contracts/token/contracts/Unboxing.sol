@@ -139,4 +139,8 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         require(amount <= address(this).balance, "Not enough balance");
         to.transfer(amount);
     }
+
+    function setUnboxPrice(uint256 price) public onlyAdmin {
+        unboxPrice = price;
+    }
 }
