@@ -118,7 +118,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
                 return tokenId;
             } else {
                 max++;
-                break;
+                continue;
             }
         }
 
