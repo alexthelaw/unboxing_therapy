@@ -18,11 +18,19 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor(
-        address admin
-    ) ERC721("Unboxing", "UBX") {}
+    address public admin;
+    uint256 public unboxPrice = 20 ether;
 
-    modifier onlyAdmin
+    constructor(
+        address admin_
+    ) ERC721("Unboxing", "UBX") {
+        admin = admin_;
+    }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
 
     function safeMint(string memory uri, uint256 probability) public onlyAdmin {
         uint256 tokenId = _tokenIdCounter.current();
@@ -68,8 +76,8 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         require(elements.length > 0, "Array must not be empty");
 
         uint256 totalProbability = 0;
-        for (uint256 i = 0; i < elements.length; i++) {
-            totalProbability += elements[i].probability;
+        for (uint256 x = 0; x < elements.length; x++) {
+            totalProbability += elements[x].probability;
         }
 
         uint256 randomValue = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % totalProbability;
@@ -94,19 +102,62 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return generateRandomElement(elements);
     }
 
-    function sendRandomToken(address to, uint256 count) public onlyAdmin returns (uint256) {
-        // check msg.value >= 20 ETH
+    function sendRandomToken(address to) public payable onlyAdmin returns (uint256, uint256, uint256) {
+        require(msg.value >= unboxPrice, "Not enough money");
+
+        uint256 tokenId1 = 0;
         for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
             if (!isUnboxed[i]) {
                 uint256 tokenId = generateRandomTokenId();
                 safeTransferFrom(msg.sender, to, tokenId);
                 isUnboxed[tokenId] = true;
                 probabilities[tokenId] = 0;
-                return tokenId;
+                tokenId1 = tokenId;
             }
         }
-        revert("No more tokens to unbox");
+        require(tokenId1 != 0, "No tokens left [1]");
+
+        uint256 tokenId2 = 0;
+        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+            if (!isUnboxed[i]) {
+                uint256 tokenId = generateRandomTokenId();
+                safeTransferFrom(msg.sender, to, tokenId);
+                isUnboxed[tokenId] = true;
+                probabilities[tokenId] = 0;
+                tokenId2 = tokenId;
+            }
+        }
+        require(tokenId2 != 0, "No tokens left [1]");
+
+        uint256 tokenId3 = 0;
+        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+            if (!isUnboxed[i]) {
+                uint256 tokenId = generateRandomTokenId();
+                safeTransferFrom(msg.sender, to, tokenId);
+                isUnboxed[tokenId] = true;
+                probabilities[tokenId] = 0;
+                tokenId3 = tokenId;
+            }
+        }
+        require(tokenId3 != 0, "No tokens left [1]");
+
+        return (tokenId1, tokenId2, tokenId3);
     }
 
-    function withdraw() onlyAdmin {}
+    function setAdmin(address admin_) public onlyAdmin {
+        admin = admin_;
+    }
+
+    function getBalance() public view onlyAdmin returns (uint256) {
+        return address(this).balance;
+    }
+
+    function withdraw(address payable to, uint256 amount) public onlyAdmin {
+        require(amount <= address(this).balance, "Not enough balance");
+        to.transfer(amount);
+    }
+
+    function setUnboxPrice(uint256 price) public onlyAdmin {
+        unboxPrice = price;
+    }
 }
