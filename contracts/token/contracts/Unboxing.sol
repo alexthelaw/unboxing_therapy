@@ -76,8 +76,8 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         require(elements.length > 0, "Array must not be empty");
 
         uint256 totalProbability = 0;
-        for (uint256 i = 0; i < elements.length; i++) {
-            totalProbability += elements[i].probability;
+        for (uint256 x = 0; x < elements.length; x++) {
+            totalProbability += elements[x].probability;
         }
 
         uint256 randomValue = uint256(keccak256(abi.encodePacked(block.timestamp, block.prevrandao))) % totalProbability;
@@ -107,7 +107,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         require(msg.value >= unboxPrice, "Not enough money");
 
         uint256[] memory tokenIds = new uint256[](count);
-        for (uint256 c = 0; c < count; i++) {
+        for (uint256 c = 0; c < count; c++) {
             for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
                 if (!isUnboxed[i]) {
                     uint256 tokenId = generateRandomTokenId();
