@@ -102,29 +102,46 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return generateRandomElement(elements);
     }
 
-    function sendRandomToken(address to, uint256 count) public payable onlyAdmin returns (uint256[] memory) {
-        require(count > 0, "Count must be greater than 0");
+    function sendRandomToken(address to) public payable onlyAdmin returns (uint256, uint256, uint256) {
         require(msg.value >= unboxPrice, "Not enough money");
 
-        uint256[] memory tokenIds = new uint256[](count);
-        for (uint256 c = 0; c < count; c++) {
-            for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-                if (!isUnboxed[i]) {
-                    uint256 tokenId = generateRandomTokenId();
-                    safeTransferFrom(msg.sender, to, tokenId);
-                    isUnboxed[tokenId] = true;
-                    probabilities[tokenId] = 0;
-                    tokenIds[c] = tokenId;
-                }
+        uint256 tokenId1 = 0;
+        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+            if (!isUnboxed[i]) {
+                uint256 tokenId = generateRandomTokenId();
+                safeTransferFrom(msg.sender, to, tokenId);
+                isUnboxed[tokenId] = true;
+                probabilities[tokenId] = 0;
+                tokenId1 = tokenId;
             }
         }
+        require(tokenId1 != 0, "No tokens left [1]");
 
-        // check that all tokenIds are not 0
-        for (uint256 y = 0; y < count; y++) {
-            require(tokenIds[y] != 0, "Failed to generate random token");
+        uint256 tokenId2 = 0;
+        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+            if (!isUnboxed[i]) {
+                uint256 tokenId = generateRandomTokenId();
+                safeTransferFrom(msg.sender, to, tokenId);
+                isUnboxed[tokenId] = true;
+                probabilities[tokenId] = 0;
+                tokenId2 = tokenId;
+            }
         }
+        require(tokenId2 != 0, "No tokens left [1]");
 
-        return tokenIds;
+        uint256 tokenId3 = 0;
+        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+            if (!isUnboxed[i]) {
+                uint256 tokenId = generateRandomTokenId();
+                safeTransferFrom(msg.sender, to, tokenId);
+                isUnboxed[tokenId] = true;
+                probabilities[tokenId] = 0;
+                tokenId3 = tokenId;
+            }
+        }
+        require(tokenId3 != 0, "No tokens left [1]");
+
+        return (tokenId1, tokenId2, tokenId3);
     }
 
     function setAdmin(address admin_) public onlyAdmin {
