@@ -18,11 +18,19 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
 
     Counters.Counter private _tokenIdCounter;
 
-    constructor(
-        address admin
-    ) ERC721("Unboxing", "UBX") {}
+    address public admin;
+    uint256 public unboxPrice = 20 ether;
 
-    modifier onlyAdmin
+    constructor(
+        address admin_
+    ) ERC721("Unboxing", "UBX") {
+        admin = admin_;
+    }
+
+    modifier onlyAdmin() {
+        require(msg.sender == admin, "Only admin can call this function");
+        _;
+    }
 
     function safeMint(string memory uri, uint256 probability) public onlyAdmin {
         uint256 tokenId = _tokenIdCounter.current();
@@ -94,19 +102,41 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return generateRandomElement(elements);
     }
 
-    function sendRandomToken(address to, uint256 count) public onlyAdmin returns (uint256) {
-        // check msg.value >= 20 ETH
-        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-            if (!isUnboxed[i]) {
-                uint256 tokenId = generateRandomTokenId();
-                safeTransferFrom(msg.sender, to, tokenId);
-                isUnboxed[tokenId] = true;
-                probabilities[tokenId] = 0;
-                return tokenId;
+    function sendRandomToken(address to, uint256 count) public payable onlyAdmin returns (uint256[] memory) {
+        require(count > 0, "Count must be greater than 0");
+        require(msg.value >= unboxPrice, "Not enough money");
+
+        uint256[] memory tokenIds = new uint256[](count);
+        for (uint256 c = 0; c < count; i++) {
+            for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+                if (!isUnboxed[i]) {
+                    uint256 tokenId = generateRandomTokenId();
+                    safeTransferFrom(msg.sender, to, tokenId);
+                    isUnboxed[tokenId] = true;
+                    probabilities[tokenId] = 0;
+                    tokenIds[c] = tokenId;
+                }
             }
         }
-        revert("No more tokens to unbox");
+
+        // check that all tokenIds are not 0
+        for (uint256 y = 0; y < count; y++) {
+            require(tokenIds[y] != 0, "Failed to generate random token");
+        }
+
+        return tokenIds;
     }
 
-    function withdraw() onlyAdmin {}
+    function setAdmin(address admin_) public onlyAdmin {
+        admin = admin_;
+    }
+
+    function getBalance() public view onlyAdmin returns (uint256) {
+        return address(this).balance;
+    }
+
+    function withdraw(address payable to, uint256 amount) public onlyAdmin {
+        require(amount <= address(this).balance, "Not enough balance");
+        to.transfer(amount);
+    }
 }
