@@ -1,7 +1,8 @@
-import { h } from 'preact';
-import { RewardTags, tagToImage, tagToName } from '@utils';
+import { Fragment, h } from 'preact';
+import { RewardTags, startAndEnd, tagToImage, tagToName } from '@utils';
 
 import P from '../../components/UI/P';
+import { useUser } from '../../Provider';
 
 import styles from './prizes.css';
 
@@ -26,6 +27,12 @@ const prizesArray: PrizesType[] = [
 ];
 
 const PrizesPage = () => {
+  const { userRuffles } = useUser();
+
+  const getToken = (tag: RewardTags): string | undefined => {
+    return userRuffles[0]?.tokens.filter(t => t.tag === tag && t.txHash)[0]?.txHash;
+  };
+
   return (
     <div className={styles.container}>
       <div style={{ height: '143px' }} />
@@ -34,9 +41,22 @@ const PrizesPage = () => {
           <div className={styles.prize}>
             <div className={styles.left}>
               <img src={tagToImage[prize.tag]} style={{ width: '77px', aspectRatio: '1/1' }} />
-              <P className={styles.text}>{tagToName[prize.tag]}</P>
+              <div style={{ textAlign: 'left' }}>
+                <P className={styles.text}>{tagToName[prize.tag]}</P>
+                <a
+                  style={{ color: '#4DC9AC' }}
+                  href={`https://explorer.testnet.mantle.xyz/tx/${getToken(prize.tag)}`}
+                  target={'_blank'}
+                >
+                  {getToken(prize.tag) ? (
+                    <Fragment>
+                      Your tx:
+                      {startAndEnd(getToken(prize.tag), 6)}
+                    </Fragment>
+                  ) : null}
+                </a>
+              </div>
             </div>
-            {prize.isClaimed ? <P className={styles.text}>Claimed</P> : <button disabled>Claim</button>}
           </div>
         ))}
       </div>

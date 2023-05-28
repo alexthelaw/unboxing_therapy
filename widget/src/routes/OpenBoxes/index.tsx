@@ -1,5 +1,7 @@
 import { Fragment, h } from 'preact';
 import { useContext, useEffect, useState } from 'preact/compat';
+import { tagToBigImage, tagToRewardedImage } from '@utils';
+import { useWeb3 } from '@utils';
 import clsx from 'clsx';
 import { ethers } from 'ethers';
 
@@ -10,8 +12,6 @@ import { RouterContext } from '../../layout';
 import { TUserRuffle } from '../../models';
 import { useUser } from '../../Provider';
 import { useSlideNotification } from '../../Provider/SlideNotification/useSlideNotification';
-import { tagToBigImage, tagToRewardedImage } from '../../utils/someTo';
-import { useWeb3 } from '../../utils/Web3Context';
 import styles from '../Auth/auth.css';
 import Border from '../Auth/Border.svg';
 import BorderColor from '../Auth/BorderColor.svg';
@@ -55,7 +55,7 @@ const OpenBoxesPage = () => {
       const tokenId = (_tokenId as ethers.BigNumber).toNumber();
       const tag = await getMetaData(tokenId);
       console.log({ tag });
-      addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag }, 0);
+      addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag, txHash: data2.transactionHash }, 0);
       setDisabled(false);
     } else {
       setDisabled(false);

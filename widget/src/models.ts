@@ -37,6 +37,7 @@ export type Token = {
   tokenId: number;
   isClaimed: boolean;
   isOpened: boolean;
+  txHash: string;
 };
 
 export type TUserRuffle = {

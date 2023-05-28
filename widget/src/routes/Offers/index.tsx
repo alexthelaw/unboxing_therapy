@@ -73,8 +73,11 @@ const UserData = () => {
   const goButtonClick = async () => {
     const sender = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
     const d = await getBalance(sender as string);
-    const notFinishedRuffle = userRuffles.find(_ruffle => _ruffle.tokens.length && _ruffle.tokens.length !== 3);
+    const notFinishedRuffle = userRuffles.find(
+      _ruffle => _ruffle.tokens.length && _ruffle.tokens.length !== 3 && _ruffle.tokens.length % 3 !== 0,
+    );
     if (notFinishedRuffle && notFinishedRuffle.tokens.some(t => !t.isOpened)) {
+      console.log(notFinishedRuffle);
       setRoute('/openBoxes');
       return;
     }
@@ -97,7 +100,8 @@ const UserData = () => {
       const ruffleId = notFinishedRuffle ? notFinishedRuffle.id : userRuffles.at(-1)?.id || 0;
       const tag = await getMetaData(tokenId);
       console.log({ tag });
-      addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag }, ruffleId);
+      console.log('tx hash', data2.transactionHash);
+      addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag, txHash: data2.transactionHash }, ruffleId);
       setRoute('/openBoxes');
     } else {
       setIsShown(true);

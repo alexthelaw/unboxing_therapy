@@ -1,14 +1,14 @@
 import { Fragment, h } from 'preact';
 import { useContext, useState } from 'preact/hooks';
+import { useWeb3 } from '@utils';
 import { connect, getAccount } from 'web3-tools-easy';
 
 import { SettingsCard } from '../../components/cards/SettingsCard';
-import { MetamaskIcon, WalletConnectIcon } from '../../components/UI/icons';
+import { MetamaskIcon } from '../../components/UI/icons';
 import Loader from '../../components/UI/Loader';
 import P from '../../components/UI/P';
 import { SMART_ACCOUNT_ADDRESS } from '../../constants';
 import { RouterContext } from '../../layout';
-import { useWeb3 } from '../../utils/Web3Context';
 
 import styles from './auth.css';
 import bgImage from './BG.png';
@@ -65,7 +65,6 @@ export default () => {
         ) : (
           <Fragment>
             <SettingsCard title="Metamask" icon={<MetamaskIcon />} onClick={auth} />
-            <SettingsCard title="WalletConnect" icon={<WalletConnectIcon />} onClick={auth} />
           </Fragment>
         )}
       </div>
