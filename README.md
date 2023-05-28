@@ -82,4 +82,4 @@ For our solution, we deployed several smart contracts:
 `0xe6170714AeeC6C692142c150E6Fb1B0E0a4411cf`
 
 - Modified ERC-721 collection for prizes distribution.
-`0x0413C77f075c1586E06D49997F4368Aa8DB74f6a`
+`0x2d96510dBa662a6392A6377681D86abbd107C35a`
