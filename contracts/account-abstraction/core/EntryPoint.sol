@@ -17,9 +17,10 @@ import "./StakeManager.sol";
 import "./SenderCreator.sol";
 import "./Helpers.sol";
 import "./NonceManager.sol";
+import "../samples/callback/TokenCallbackHandler.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 
-contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard {
+contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard, TokenCallbackHandler {
 
     using UserOperationLib for UserOperation;
 
@@ -221,16 +222,13 @@ contract EntryPoint is IEntryPoint, StakeManager, NonceManager, ReentrancyGuard 
         uint256 preOpGas;
     }
 
-    function playUnboxRuffle(address to, address sender, bytes memory callData, uint256 value) external returns (bool) {
+    function playUnboxRuffle(address to, address sender, bytes memory callData, uint256 value) external returns (bytes memory) {
         require(value >= 20000000000000000000, "To small value");
         require(value <= balanceOf(sender), "Not enough balance");
         require(callData.length > 0, "No callData");
         _payForSmth(sender, value);
-        bool success = Exec.call(to, value, callData, 150000);
-        if (success) {
-            return success;
-        }
-        return false;
+        (bool success, bytes memory result) = sender.call{value : 0}(callData);
+        return result;
     }
 
     /**
