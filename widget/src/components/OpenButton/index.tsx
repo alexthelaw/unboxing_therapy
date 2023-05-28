@@ -1,10 +1,11 @@
 import { h } from 'preact';
 import { CSSProperties } from 'preact/compat';
 import { useCallback, useContext } from 'preact/hooks';
-import Heart from './heart.svg'
+
 import { GlobalsContext } from '../../AppContext';
 import { useMediaQuery } from '../../hooks/useMediaQuery';
 
+import Heart from './heart.svg';
 import styles from './openButton.css';
 
 const Index = () => {
@@ -18,9 +19,8 @@ const Index = () => {
 
   const mt = window.innerHeight * 0.1;
 
-
   const stylesInline: () => CSSProperties = useCallback(() => {
-    let background = '';
+    const background = '';
     return {
       position: 'fixed',
       right: isMobile ? '50%' : '95px',
@@ -28,13 +28,12 @@ const Index = () => {
       transform: isMobile ? 'translate(50%,-50%)' : undefined,
       background,
     };
-
   }, [isMobile]);
 
   return (
     <div onClick={openHandler} className={styles.container} style={stylesInline()}>
       <div className={styles.inner}>
-        <img src={Heart} className={styles.img}/>
+        <img src={Heart} className={styles.img} />
         <p className={styles.text}>Unboxing Therapy</p>
       </div>
     </div>

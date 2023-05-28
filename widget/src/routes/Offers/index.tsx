@@ -1,11 +1,16 @@
 import { Fragment, h } from 'preact';
 import { useContext, useEffect, useState } from 'preact/compat';
 import { copy, startAndEnd } from '@utils';
+import { useWeb3 } from '@utils';
+import { ethers } from 'ethers';
 
 import { OfferPageCard } from '../../components/cards/OfferPageCard';
 import { CopyIcon } from '../../components/UI/icons';
 import P from '../../components/UI/P';
+import { SMART_ACCOUNT_ADDRESS } from '../../constants';
 import { RouterContext } from '../../layout';
+import { useUser } from '../../Provider';
+import { useSlideNotification } from '../../Provider/SlideNotification/useSlideNotification';
 
 import styles from './offers.css';
 import PreviewImage from './Preview.png';
@@ -59,16 +64,62 @@ const Page = () => {
 };
 
 const UserData = () => {
+  const { userRuffles, addTokenToRuffle } = useUser();
+  const { setIsShown } = useSlideNotification();
+  const { generateRuffleCallData, getBalance, generateExecuteRuffleFn, playUnbox2, getMetaData, playUnbox } = useWeb3();
   const { setRoute } = useContext(RouterContext);
-  const [topUpBalance] = useState<string>('0x018A81aaF8b984d0f0d962580D476505d4130b94');
+  const [topUpBalance] = useState<string>(localStorage.getItem(SMART_ACCOUNT_ADDRESS) as string);
 
-  const goButtonClick = () => {
-    setRoute('/openBoxes');
+  const goButtonClick = async () => {
+    const sender = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
+    const d = await getBalance(sender as string);
+    const notFinishedRuffle = userRuffles.find(_ruffle => _ruffle.tokens.length && _ruffle.tokens.length !== 3);
+    if (notFinishedRuffle && notFinishedRuffle.tokens.some(t => !t.isOpened)) {
+      setRoute('/openBoxes');
+      return;
+    }
+    if (Number(d) < 20) {
+      setIsShown(true);
+      setTimeout(() => setIsShown(false), 2000);
+      return;
+    }
+    const ruffleCallData = generateRuffleCallData(sender as string);
+    const executeData = generateExecuteRuffleFn(ruffleCallData);
+    await playUnbox(sender as string, executeData);
+    console.log(executeData);
+    const data2 = await playUnbox2(sender as string);
+    // console.log(data);
+    console.log(data2);
+    if (data2) {
+      const event = data2.events.find((_event: any) => _event.event === 'Transfer');
+      const [_from, _to, _tokenId] = event.args;
+      const tokenId = (_tokenId as ethers.BigNumber).toNumber();
+      const ruffleId = notFinishedRuffle ? notFinishedRuffle.id : userRuffles.at(-1)?.id || 0;
+      const tag = await getMetaData(tokenId);
+      console.log({ tag });
+      addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag }, ruffleId);
+      setRoute('/openBoxes');
+    } else {
+      setIsShown(true);
+      setTimeout(() => setIsShown(false), 2000);
+      return;
+    }
   };
 
   const copyHandle = async () => {
     await copy(topUpBalance);
   };
+
+  useEffect(() => {
+    const a = async () => {
+      console.log('send');
+      const sender = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
+      const d = await getBalance(sender as string);
+      console.log(d);
+    };
+
+    a();
+  }, []);
 
   return (
     <div className={styles.data_wrapper}>

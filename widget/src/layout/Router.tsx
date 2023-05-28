@@ -1,13 +1,13 @@
 import { ComponentType, createContext, createElement, h, VNode } from 'preact';
 import { useMemo, useState } from 'preact/hooks';
-import { ApolloContext } from '@utils';
 
 import BottomNav from '../components/BottomNav';
 import TitleBar from '../components/TitleBar';
 import { UserProvider } from '../Provider';
 import { SlideNotificationProvider } from '../Provider/SlideNotification/context';
+import { Web3ContextProvider } from '../utils/Web3Context';
 
-const DEFAULT_ROUTE = '/openBoxes';
+const DEFAULT_ROUTE = '/';
 
 interface Props {
   /**
@@ -70,11 +70,11 @@ export const Router = ({ routes, onChange }: Props) => {
       }}
     >
       <TitleBar />
-      <ApolloContext>
+      <Web3ContextProvider>
         <UserProvider>
           <SlideNotificationProvider>{routes[route]}</SlideNotificationProvider>
         </UserProvider>
-      </ApolloContext>
+      </Web3ContextProvider>
       {route !== '/' ? <BottomNav /> : <div style={{ height: '80px' }} />}
     </RouterContext.Provider>
   );

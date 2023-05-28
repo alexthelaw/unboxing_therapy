@@ -1,8 +1,7 @@
 import { h } from 'preact';
+import { RewardTags, tagToImage, tagToName } from '@utils';
 
-import { RewardTag } from '../../components/RewardTag';
 import P from '../../components/UI/P';
-import { RewardTags } from '../../utils/someTo';
 
 import styles from './prizes.css';
 
@@ -22,7 +21,7 @@ const prizesArray: PrizesType[] = [
   },
   {
     tag: 'utnft',
-    isClaimed: true,
+    isClaimed: false,
   },
 ];
 
@@ -30,11 +29,14 @@ const PrizesPage = () => {
   return (
     <div className={styles.container}>
       <div style={{ height: '143px' }} />
-      <div>
+      <div className={styles.wrapper}>
         {prizesArray.map(prize => (
           <div className={styles.prize}>
-            <RewardTag type={prize.tag} />
-            {prize.isClaimed ? <P className={styles.text}>Claimed</P> : <button>Claim</button>}
+            <div className={styles.left}>
+              <img src={tagToImage[prize.tag]} style={{ width: '77px', aspectRatio: '1/1' }} />
+              <P className={styles.text}>{tagToName[prize.tag]}</P>
+            </div>
+            {prize.isClaimed ? <P className={styles.text}>Claimed</P> : <button disabled>Claim</button>}
           </div>
         ))}
       </div>

@@ -2,12 +2,13 @@ import { Fragment, h } from 'preact';
 import { useContext, useState } from 'preact/hooks';
 import { connect, getAccount } from 'web3-tools-easy';
 
-import { AuthListener } from '../../components/AuthListener';
 import { SettingsCard } from '../../components/cards/SettingsCard';
 import { MetamaskIcon, WalletConnectIcon } from '../../components/UI/icons';
 import Loader from '../../components/UI/Loader';
 import P from '../../components/UI/P';
+import { SMART_ACCOUNT_ADDRESS } from '../../constants';
 import { RouterContext } from '../../layout';
+import { useWeb3 } from '../../utils/Web3Context';
 
 import styles from './auth.css';
 import bgImage from './BG.png';
@@ -16,19 +17,23 @@ import BorderColor from './BorderColor.svg';
 import HeartImage from './heart.png';
 
 export default () => {
+  const { createAccount } = useWeb3();
   const router = useContext(RouterContext);
   const [loading, setLoading] = useState<boolean>(false);
 
   const auth = async () => {
     setLoading(true);
     await connect();
-    if (await getAccount()) {
-      await authHandler();
+    const acc = await getAccount();
+    if (acc) {
+      const data = await createAccount(acc);
+      if (data) authHandler(data);
     }
     setLoading(false);
   };
 
-  const authHandler = async () => {
+  const authHandler = (address: string) => {
+    localStorage.setItem(SMART_ACCOUNT_ADDRESS, address);
     router.setRoute('/offers');
     setLoading(false);
   };
@@ -64,7 +69,6 @@ export default () => {
           </Fragment>
         )}
       </div>
-      <AuthListener onSuccess={authHandler} />
     </div>
   );
 };

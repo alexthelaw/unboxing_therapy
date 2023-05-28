@@ -1,4 +1,4 @@
-import { ApiResponse } from './services/types';
+import { RewardTags } from './utils/someTo';
 
 interface InfraConfigurations {
   element?: HTMLElement;
@@ -25,10 +25,6 @@ export interface AppConfigurations {
 
 export type Configurations = InfraConfigurations & AppConfigurations;
 
-export interface WidgetApi {
-  whoami: () => Promise<ApiResponse<WhoamiResponse>>;
-}
-
 export interface Globals {
   widgetOpen: boolean;
   setWidgetOpen: (open: boolean) => void;
@@ -36,9 +32,20 @@ export interface Globals {
   setClosedDelay: (delay: number) => void;
 }
 
+export type Token = {
+  tag: RewardTags;
+  tokenId: number;
+  isClaimed: boolean;
+  isOpened: boolean;
+};
+
+export type TUserRuffle = {
+  tokens: Array<Token>;
+  id: number;
+};
+
 export interface UserStorage {
-  userData: AuthenticationResponseObjectType;
-  activePerk: PerkObjectType & { tag: string };
-  setActivePerk: (s: string) => void;
-  fetchDataLoading: boolean;
+  userRuffles: TUserRuffle[];
+  addTokenToRuffle: (_token: Token, ruffleId: number) => void;
+  setIsClaimed: (tokenId: number, ruffleId: number) => void;
 }

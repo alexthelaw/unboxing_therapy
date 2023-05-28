@@ -15,22 +15,63 @@
     display: none;
 }
 .green_text {
+    font-weight: 800;
     color: #4DC9AC;
 }
 
 .qr_code_wrapper {
-    margin-top: 40px;
     align-self: center;
-    width: 110px;
-    height: 110px;
-    background: white;
     border-radius: 10px;
     display: grid;
     place-content: center;
-    padding: 10px;
 }
 
 .qr_code_wrapper img {
     width: 100px;
     height: 100px;
+}
+
+.btn {
+    margin-top: 110px;
+    width: 100%;
+}
+
+.btn button {
+    background: white;
+    border: 1px solid black;
+    color: black;
+    margin: 0;
+    width: 100%;
+    align-self: flex-end;
+}
+
+.wrapper {
+    width: fit-content;
+    padding: 8px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: white;
+    border: 1px solid black;
+    border-radius: 16px;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.column {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.wrapper svg {
+    width: 24px;
+    aspect-ratio: 1/1;
 }
