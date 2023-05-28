@@ -607,7 +607,6 @@
             w[o] = w[o] || function () { (w[o].q = w[o].q || []).push(arguments) };
             js = d.createElement(s), fjs = d.getElementsByTagName(s)[0];
             js.id = o; js.src = f; js.async = 1; fjs.parentNode.insertBefore(js, fjs);
-            const params=new Proxy(new URLSearchParams(w.location.search),{get:(e,a)=>e.get(a)});params.code&&(w.localStorage.setItem("auth_code",params.code),w.close());
         }(window, document, 'script', 'ut', './widget.js'));
         ut('init', { debug: true });
     </script>
