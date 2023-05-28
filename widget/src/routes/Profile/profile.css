@@ -32,11 +32,21 @@
 }
 
 .btn {
-    margin-top: 110px;
+    margin-top: 60px;
     width: 100%;
+    line-height: unset;
 }
 
 .btn button {
+    background: white;
+    border: 1px solid black;
+    color: black;
+    margin: 0;
+    width: 100%;
+    align-self: flex-end;
+}
+
+.btn button:hover {
     background: white;
     border: 1px solid black;
     color: black;

@@ -32,7 +32,7 @@ export const SlideComponent = () => {
         [styles.open]: isShown,
       })}
     >
-      <span style={{ marginBottom: '50px' }}>Insufficient balance</span>
+      {isShown && <span style={{ marginBottom: '50px' }}>Insufficient balance</span>}
     </div>,
     el,
   );

@@ -51,7 +51,7 @@ const Page = () => {
     <Fragment>
       <div style={{ height: '70px' }} />
       <div className={styles.data_container}>
-        <P textSize={'l'} style={{ textAlign: 'center' }}>
+        <P textSize={'l'} style={{ textAlign: 'center', margin: 0 }}>
           Place 20 BIT bet to open 3 captivating boxes with treasures
         </P>
         <p className={styles.green_text}>Fortune favours the brave!</p>
