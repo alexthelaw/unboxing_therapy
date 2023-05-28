@@ -12,7 +12,7 @@
     border: none;
     display: grid;
     place-content: center;
-    padding: 12px;
+    padding: 12px 0;
     color: white;
     font-family: 'Gilroy', sans-serif;
     font-style: normal;

@@ -64,7 +64,6 @@
   background-color: black;
   border: 2px solid black;
   color: white;
-  padding: 12px 0;
 }
 .reset button:disabled {
   cursor: default;
