@@ -56,6 +56,15 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return super.tokenURI(tokenId);
     }
 
+    function supportsInterface(bytes4 interfaceId)
+    public
+    view
+    override(ERC721, ERC721URIStorage)
+    returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+
 
     // random functions
 
@@ -94,8 +103,9 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return generateRandomElement(elements);
     }
 
-    function sendRandomToken(address to) public onlyAdmin returns (uint256) {
-        emit Listn(msg.sender, to);
+    function sendRandomToken(address to) public payable onlyAdmin returns (uint256) {
+        require(msg.value >= unboxPrice, "Not enough money");
+
         uint256 max = _tokenIdCounter.current();
         for (uint256 i = 0; i < max; i++) {
             if (max >= 1000) {
