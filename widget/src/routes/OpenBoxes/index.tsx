@@ -6,6 +6,7 @@ import clsx from 'clsx';
 import { ethers } from 'ethers';
 
 import Line from '../../../assets/icons/support/line.png';
+import { RewardTag } from '../../components/RewardTag';
 import P from '../../components/UI/P';
 import { RUFFLE_TOKENS, SMART_ACCOUNT_ADDRESS } from '../../constants';
 import { RouterContext } from '../../layout';
@@ -22,7 +23,7 @@ import openedBgImage from './OpenedBg.png';
 import stylePage from './styles.css';
 
 const OpenBoxesPage = () => {
-  const { setRoute } = useContext(RouterContext);
+  const { setRoute, setWithText } = useContext(RouterContext);
   const { generateRuffleCallData, getBalance, generateExecuteRuffleFn, playUnbox2, getMetaData, playUnbox } = useWeb3();
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [isBgChanged, setIsBgChanged] = useState<boolean>(false);
@@ -79,6 +80,8 @@ const OpenBoxesPage = () => {
   const preCheck = () => {
     const data = JSON.parse(localStorage.getItem(RUFFLE_TOKENS) || '[]') as TUserRuffle[];
     const lastRuffleTokens = data.at(-1)?.tokens;
+    const text = `Open boxes - ${(lastRuffleTokens?.length || 1) % 3}/3`;
+    setWithText(text);
     if (
       lastRuffleTokens &&
       lastRuffleTokens.length &&
@@ -86,6 +89,7 @@ const OpenBoxesPage = () => {
       lastRuffleTokens.splice(-3).every(token => token.isOpened)
     ) {
       setIsAllClaimed(true);
+      setWithText(false);
     } else if (lastRuffleTokens?.at(-1)?.isOpened) {
       setIsBgChanged(true);
       setIsOpened(true);
@@ -171,6 +175,7 @@ const OpenBoxesPage = () => {
           </div>
           <div />
           <div className={stylePage.btns}>
+            {isBgChanged ? <RewardTag type={userRuffles.at(-1)?.tokens.at(-1)?.tag || 'utnft'} /> : null}
             <button className={stylePage.button} onClick={isBgChanged ? clickHandler : openHandler} disabled={disabled}>
               {isOpened ? 'Next' : 'Open'}
             </button>

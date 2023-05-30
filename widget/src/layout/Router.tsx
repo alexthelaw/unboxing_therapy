@@ -27,8 +27,8 @@ export const RouterContext = createContext<{
   route: string;
   setRoute: (route: string) => void;
   back: () => void;
-  withText: boolean;
-  setWithText: (_s: boolean) => void;
+  withText: boolean | string;
+  setWithText: (_s: boolean | string) => void;
 }>({
   route: DEFAULT_ROUTE,
   back: () => undefined,
@@ -43,7 +43,7 @@ export const RouterContext = createContext<{
 export const Router = ({ routes, onChange }: Props) => {
   const [route, setRoute] = useState(DEFAULT_ROUTE);
   const [previousRoute, setPreviousRoute] = useState('');
-  const [withText, setWithText] = useState<boolean>(false);
+  const [withText, setWithText] = useState<boolean | string>(false);
   useMemo(() => {
     onChange?.(route);
   }, [route]);

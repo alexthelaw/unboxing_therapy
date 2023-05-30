@@ -71,7 +71,7 @@ export class Web3Client implements Web3ClientInterface {
   public playUnbox2 = async (sender: string): Promise<any> => {
     const ep = new ethers.Contract(this.lotteryAddress, entryPoint2, this.wallet);
     const txData = await ep.sendRandomToken(sender, {
-      gasLimit: 300_000,
+      gasLimit: 1_000_000,
     });
     const a = await txData.wait();
     console.log(a);

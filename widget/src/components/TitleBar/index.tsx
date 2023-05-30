@@ -1,10 +1,11 @@
 import { Fragment, h } from 'preact';
 import { useContext, useMemo, useState } from 'preact/hooks';
+import { routeToTitle } from '@utils';
 import clsx from 'clsx';
 
 import { GlobalsContext } from '../../AppContext';
 import { RouterContext } from '../../layout';
-import { routeToTitle } from '../../utils/someTo';
+import { useUser } from '../../Provider';
 import P from '../UI/P';
 
 import BackIcon from './Back.svg';
@@ -15,10 +16,13 @@ const Index = () => {
   const { setWidgetOpen, setClosedDelay } = useContext(GlobalsContext);
   const { route, back, withText } = useContext(RouterContext);
   const [textOut, setTextOut] = useState<boolean>(true);
+  const { userRuffles } = useUser();
 
   const text = useMemo(() => {
-    return (withText && routeToTitle[route]) || '';
-  }, [route, withText]);
+    const isString = typeof withText === 'string';
+
+    return (withText && isString ? withText : withText && routeToTitle[route]) || '';
+  }, [route, withText, userRuffles]);
 
   const closeWidget = () => {
     setClosedDelay(0.8);
