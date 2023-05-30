@@ -95,7 +95,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         for (uint256 i = 0; i < elements.length; i++) {
             cumulativeProbability += elements[i].probability;
             if (randomValue < cumulativeProbability) {
-//                console.log("Random value: %s", elements[i].value);
+                //                console.log("Random value: %s", elements[i].value);
                 return elements[i].value;
             }
         }
@@ -128,8 +128,8 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         return generateRandomElement(elements);
     }
 
-    function sendRandomToken(address to) public payable onlyAdmin returns (uint256) {
-        require(msg.value >= unboxPrice, "Not enough money");
+    function sendRandomToken(address to) external onlyAdmin returns (uint256) {
+        // require(msg.value >= unboxPrice, "Not enough money");
 
         uint256 tokenId = generateRandomTokenId();
         safeTransferFrom(msg.sender, to, tokenId);
