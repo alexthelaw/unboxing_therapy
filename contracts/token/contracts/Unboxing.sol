@@ -19,7 +19,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
 
     Counters.Counter public _tokenIdCounter;
 
-    mapping(address => bool) private admins;
+    mapping(address => bool) public admins;
     uint256 public unboxPrice = 19 ether;
     event Listn(address addr, address f);
 
