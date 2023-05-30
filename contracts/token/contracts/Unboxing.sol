@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
+//import "hardhat/console.sol";
 
 /// @custom:security-contact uxname@gmail.com
 contract Unboxing is ERC721, ERC721URIStorage, Ownable {
@@ -16,7 +17,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
     // mapping token -> isUnboxed
     mapping(uint256 => bool) public isUnboxed;
 
-    Counters.Counter private _tokenIdCounter;
+    Counters.Counter public _tokenIdCounter;
 
     mapping(address => bool) private admins;
     uint256 public unboxPrice = 19 ether;
@@ -39,6 +40,13 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
         probabilities[tokenId] = probability;
+    }
+
+    function safeMultiMint(string[] memory uris, uint256[] memory probabilities_, address to) public onlyAdmin {
+        require(uris.length == probabilities_.length, "Arrays must be the same length");
+        for (uint256 i = 0; i < uris.length; i++) {
+            safeMint(uris[i], probabilities_[i], to);
+        }
     }
 
     // The following functions are overrides required by Solidity.
@@ -87,6 +95,7 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         for (uint256 i = 0; i < elements.length; i++) {
             cumulativeProbability += elements[i].probability;
             if (randomValue < cumulativeProbability) {
+//                console.log("Random value: %s", elements[i].value);
                 return elements[i].value;
             }
         }
@@ -95,10 +104,26 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
         revert("Failed to generate random element");
     }
 
-    function generateRandomTokenId() public view returns (uint256) {
-        Element[] memory elements = new Element[](_tokenIdCounter.current());
+    function generateRandomTokenId() public view returns (uint256 tokenId) {
+        // find count of non-unboxed tokens
+        uint256 unboxedCount = 0;
         for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
-            elements[i] = Element(i, probabilities[i]);
+            if (!isUnboxed[i]) {
+                unboxedCount++;
+            }
+        }
+
+        if (unboxedCount == 0) {
+            revert("No more tokens to unbox");
+        }
+
+        Element[] memory elements = new Element[](unboxedCount);
+        uint256 index = 0;
+        for (uint256 i = 0; i < _tokenIdCounter.current(); i++) {
+            if (!isUnboxed[i]) {
+                elements[index] = Element(i, probabilities[i]);
+                index++;
+            }
         }
         return generateRandomElement(elements);
     }
@@ -106,24 +131,11 @@ contract Unboxing is ERC721, ERC721URIStorage, Ownable {
     function sendRandomToken(address to) public payable onlyAdmin returns (uint256) {
         require(msg.value >= unboxPrice, "Not enough money");
 
-        uint256 max = _tokenIdCounter.current();
-        for (uint256 i = 0; i < max; i++) {
-            if (max >= 1000) {
-                revert("Too many attempts");
-            }
-            if (!isUnboxed[i]) {
-                uint256 tokenId = generateRandomTokenId();
-                safeTransferFrom(msg.sender, to, tokenId);
-                isUnboxed[tokenId] = true;
-                probabilities[tokenId] = 0;
-                return tokenId;
-            } else {
-                max++;
-                continue;
-            }
-        }
-
-        revert("No more tokens to unbox");
+        uint256 tokenId = generateRandomTokenId();
+        safeTransferFrom(msg.sender, to, tokenId);
+        isUnboxed[tokenId] = true;
+        probabilities[tokenId] = 0;
+        return tokenId;
     }
 
     function setAdmin(address admin_) public onlyAdmin {
