@@ -263,14 +263,14 @@ export const CopyIcon = ({ onClick }: { onClick: (args?: unknown) => void }): JS
     >
       <path
         d="M23.9482 20.4043V4.6543H8.19824"
-        stroke="#4DC9AC"
+        stroke="#154215"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
       />
       <path
         d="M20.4482 8.1543H4.69824V23.9043H20.4482V8.1543Z"
-        stroke="#4DC9AC"
+        stroke="#154215"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"

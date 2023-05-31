@@ -24,50 +24,57 @@ import stylePage from './styles.css';
 
 const OpenBoxesPage = () => {
   const { setRoute, setWithText } = useContext(RouterContext);
-  const { generateRuffleCallData, getBalance, generateExecuteRuffleFn, playUnbox2, getMetaData, playUnbox } = useWeb3();
+  const { generateRuffleCallData, generateExecuteRuffleFn, playUnbox2, getMetaData, playUnbox } = useWeb3();
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [isBgChanged, setIsBgChanged] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
   const { userRuffles, addTokenToRuffle, setIsClaimed } = useUser();
   const { setIsShown } = useSlideNotification();
+  const [loading, setLoading] = useState<boolean>(false);
 
   const clickHandler = async () => {
-    preCheck();
-    setDisabled(true);
-    setIsOpened(false);
-    setIsBgChanged(false);
-    const sender = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
-    const d = await getBalance(sender as string);
-    if (Number(d) < 20) {
-      setIsShown(true);
-      setTimeout(() => setIsShown(false), 2000);
-      return;
-    }
-    const ruffleCallData = generateRuffleCallData(sender as string);
-    const executeData = generateExecuteRuffleFn(ruffleCallData);
-    console.log(executeData);
-    await playUnbox(sender as string, executeData);
-    const data2 = await playUnbox2(sender as string);
-    // console.log(data);
-    console.log(data2);
-    if (data2) {
-      const event = data2.events.find((_event: any) => _event.event === 'Transfer');
-      const [_from, _to, _tokenId] = event.args;
-      const tokenId = (_tokenId as ethers.BigNumber).toNumber();
-      const tag = await getMetaData(tokenId);
-      console.log({ tag });
-      addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag, txHash: data2.transactionHash }, 0);
+    setLoading(true);
+    try {
+      preCheck();
+      setDisabled(true);
+      setIsOpened(false);
+      setIsBgChanged(false);
+      const sender = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
+      const ruffleCallData = generateRuffleCallData(sender as string);
+      const executeData = generateExecuteRuffleFn(ruffleCallData);
+      console.log(executeData);
+      await playUnbox(sender as string, executeData);
+      const data2 = await playUnbox2(sender as string);
+      // console.log(data);
+      console.log(data2);
+      if (data2) {
+        const event = data2.events.find((_event: any) => _event.event === 'Transfer');
+        const [_from, _to, _tokenId] = event.args;
+        const tokenId = (_tokenId as ethers.BigNumber).toNumber();
+        const tag = await getMetaData(tokenId);
+        console.log({ tag });
+        await addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag, txHash: data2.transactionHash }, 0);
+        setDisabled(false);
+        setLoading(false);
+        openHandler({ withoutPreCheck: true });
+      } else {
+        setDisabled(false);
+        setIsShown(true);
+        setTimeout(() => setIsShown(false), 2000);
+      }
+    } catch (e) {
+      console.log(e);
       setDisabled(false);
-    } else {
-      setDisabled(false);
       setIsShown(true);
+      setLoading(false);
       setTimeout(() => setIsShown(false), 2000);
-      return;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const openHandler = () => {
-    preCheck();
+  const openHandler = ({ withoutPreCheck = false }: { withoutPreCheck?: boolean }) => {
+    if (!withoutPreCheck) preCheck();
     const data = JSON.parse(localStorage.getItem(RUFFLE_TOKENS) || '[]') as TUserRuffle[];
     const lastRuffleTokens = data.at(-1)?.tokens;
     setIsClaimed(lastRuffleTokens?.at(-1)?.tokenId || 0, 0);
@@ -98,9 +105,17 @@ const OpenBoxesPage = () => {
     }
   };
 
+  const openHandlerClick = () => {
+    openHandler({ withoutPreCheck: false });
+  };
+
   useEffect(() => {
     preCheck();
   }, []);
+
+  useEffect(() => {
+    console.log({ loading });
+  }, [loading]);
 
   return (
     <div className={styles.container}>
@@ -162,7 +177,7 @@ const OpenBoxesPage = () => {
             ) : (
               <img src={Box} alt={'Box'} className={clsx(styles.logo_image, { [stylePage.disappear]: isOpened })} />
             )}
-            <Fragment>
+            <div className={`${styles.borders} ${loading && styles.rotate}`}>
               <img src={Border} alt={'Border'} className={`${styles.border_normal} ${styles.border_shadow}`} />
               <img src={Border} alt={'Border'} className={`${styles.border_normal_rotate} ${styles.border_shadow}`} />
               <img src={BorderColor} alt={'Border'} className={`${styles.border_normal} ${styles.border_color}`} />
@@ -171,12 +186,16 @@ const OpenBoxesPage = () => {
                 alt={'Border'}
                 className={`${styles.border_normal_rotate} ${styles.border_color}`}
               />
-            </Fragment>
+            </div>
           </div>
           <div />
           <div className={stylePage.btns}>
             {isBgChanged ? <RewardTag type={userRuffles.at(-1)?.tokens.at(-1)?.tag || 'utnft'} /> : null}
-            <button className={stylePage.button} onClick={isBgChanged ? clickHandler : openHandler} disabled={disabled}>
+            <button
+              className={stylePage.button}
+              onClick={!isBgChanged ? clickHandler : openHandlerClick}
+              disabled={disabled}
+            >
               {isOpened ? 'Next' : 'Open'}
             </button>
           </div>

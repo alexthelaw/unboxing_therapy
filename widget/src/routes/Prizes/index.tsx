@@ -13,8 +13,8 @@ const PrizesPage = () => {
     <div className={styles.container}>
       <div style={{ marginTop: '143px' }} />
       <div className={styles.wrapper}>
-        {!userRuffles || !userRuffles[0] || !userRuffles[0].tokens ? <P>You prizes will appear here</P> : null}
-        {userRuffles[0].tokens.map(prize =>
+        {!userRuffles || !userRuffles[0] || !userRuffles[0].tokens ? <P>Your prizes will appear here</P> : null}
+        {userRuffles[0]?.tokens.map(prize =>
           prize.txHash ? (
             <div className={styles.prize}>
               <div className={styles.left}>

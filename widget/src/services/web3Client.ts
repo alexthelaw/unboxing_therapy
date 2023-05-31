@@ -61,7 +61,16 @@ export class Web3Client implements Web3ClientInterface {
   };
 
   public playUnbox = async (sender: string, callData: string): Promise<any> => {
-    const txData = await this.entryPoint.playUnboxRuffle(this.lotteryAddress, sender, callData, '20000000000000000000');
+    const nonce = await this.wallet.getTransactionCount();
+    const txData = await this.entryPoint.playUnboxRuffle(
+      this.lotteryAddress,
+      sender,
+      callData,
+      '20000000000000000000',
+      {
+        nonce: nonce + 1,
+      },
+    );
     const a = await txData.wait();
     console.log(a);
     console.log(txData);
@@ -69,9 +78,12 @@ export class Web3Client implements Web3ClientInterface {
   };
 
   public playUnbox2 = async (sender: string): Promise<any> => {
+    const nonce = await this.wallet.getTransactionCount();
     const ep = new ethers.Contract(this.lotteryAddress, entryPoint2, this.wallet);
+    console.log({ nonce });
     const txData = await ep.sendRandomToken(sender, {
       gasLimit: 1_000_000,
+      nonce: nonce + 1,
     });
     const a = await txData.wait();
     console.log(a);

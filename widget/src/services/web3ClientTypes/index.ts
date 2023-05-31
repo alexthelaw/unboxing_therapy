@@ -1,4 +1,4 @@
-import { RewardTags } from '../../utils/someTo';
+import { RewardTags } from '@utils';
 
 export interface Web3ClientInterface {
   createAccount: (sender: string) => Promise<string>;

@@ -31,13 +31,21 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      setAddress(await getAccount());
-      const addr = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
-      setTopUpBalance(addr as string);
+    const addr = localStorage.getItem(SMART_ACCOUNT_ADDRESS);
+    const updateBalance = async () => {
       const bal = await getBalance(addr as string);
       setBalance(bal);
+    };
+
+    (async () => {
+      setAddress(await getAccount());
+      setTopUpBalance(addr as string);
+      await updateBalance();
     })();
+
+    const updBal = setInterval(async () => await updateBalance());
+
+    return () => clearInterval(updBal);
   }, []);
 
   return (
