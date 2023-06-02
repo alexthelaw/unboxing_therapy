@@ -1,6 +1,7 @@
 import { h } from 'preact';
 import { useContext, useEffect, useState } from 'preact/compat';
 import { copy, startAndEnd } from '@utils';
+import { useWeb3 } from '@utils';
 import { getAccount } from 'web3-tools-easy';
 
 import addressImage from '../../../assets/icons/support/address.svg';
@@ -10,7 +11,6 @@ import { CopyIcon } from '../../components/UI/icons';
 import P from '../../components/UI/P';
 import { SMART_ACCOUNT_ADDRESS } from '../../constants';
 import { RouterContext } from '../../layout';
-import { useWeb3 } from '../../utils/Web3Context';
 
 import styles from './profile.css';
 
