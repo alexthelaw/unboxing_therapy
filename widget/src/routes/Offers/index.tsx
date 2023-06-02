@@ -47,7 +47,7 @@ const OffersPage = () => {
 const Page = () => {
   return (
     <Fragment>
-      <div style={{ height: '70px' }} />
+      <div style={{ height: '140px' }} />
       <div className={styles.data_container}>
         <P textSize={'l'} style={{ textAlign: 'center', margin: 0 }}>
           Place 60 BIT bet to open 3 captivating boxes with treasures
@@ -56,7 +56,7 @@ const Page = () => {
         <OfferPageCard />
         <UserData />
       </div>
-      <div />
+      <div style={{ marginBottom: '150px' }} />
     </Fragment>
   );
 };

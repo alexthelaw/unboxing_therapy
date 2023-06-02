@@ -50,7 +50,7 @@ const ProfilePage = () => {
 
   return (
     <div className={styles.container}>
-      <div style={{ height: '105px' }} />
+      <div style={{ marginTop: '105px' }} />
       <div className={styles.wrapper}>
         <img src={addressImage} alt={''} />
         <P textSize={'xl'} weight={'bold'} className={styles.column}>
@@ -88,6 +88,7 @@ const ProfilePage = () => {
       <div className={styles.btn}>
         <button onClick={logout}>Log Out</button>
       </div>
+      <div style={{ marginBottom: '150px' }} />
     </div>
   );
 };
