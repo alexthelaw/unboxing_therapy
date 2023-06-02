@@ -43,7 +43,7 @@ const ProfilePage = () => {
       await updateBalance();
     })();
 
-    const updBal = setInterval(async () => await updateBalance());
+    const updBal = setInterval(async () => await updateBalance(), 5000);
 
     return () => clearInterval(updBal);
   }, []);

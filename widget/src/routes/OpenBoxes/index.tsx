@@ -1,6 +1,6 @@
 import { Fragment, h } from 'preact';
-import { useContext, useEffect, useState } from 'preact/compat';
-import { tagToBigImage, tagToRewardedImage } from '@utils';
+import { useCallback, useContext, useEffect, useState } from 'preact/compat';
+import { RewardTags, tagToBigImage, tagToRewardedImage } from '@utils';
 import { useWeb3 } from '@utils';
 import clsx from 'clsx';
 import { ethers } from 'ethers';
@@ -28,14 +28,17 @@ const OpenBoxesPage = () => {
   const [isOpened, setIsOpened] = useState<boolean>(false);
   const [isBgChanged, setIsBgChanged] = useState<boolean>(false);
   const [disabled, setDisabled] = useState<boolean>(false);
-  const { userRuffles, addTokenToRuffle, setIsClaimed } = useUser();
+  const { addTokenToRuffle, setIsClaimed } = useUser();
   const { setIsShown } = useSlideNotification();
   const [loading, setLoading] = useState<boolean>(false);
+  const [step, setStep] = useState<number>(1);
+  const [claimedTokenstags, setClaimedTokensTags] = useState<RewardTags[]>([]);
 
   const clickHandler = async () => {
+    setStep(prev => prev + 1);
     setLoading(true);
     try {
-      preCheck();
+      if (!preCheck()) return;
       setDisabled(true);
       setIsOpened(false);
       setIsBgChanged(false);
@@ -54,9 +57,12 @@ const OpenBoxesPage = () => {
         const tag = await getMetaData(tokenId);
         console.log({ tag });
         await addTokenToRuffle({ isOpened: false, isClaimed: false, tokenId, tag, txHash: data2.transactionHash }, 0);
+        setClaimedTokensTags(prevState => [...prevState, tag]);
         setDisabled(false);
         setLoading(false);
-        openHandler({ withoutPreCheck: true });
+        setIsClaimed(tokenId, 0);
+        setIsOpened(prev => !prev);
+        setTimeout(() => setIsBgChanged(prev => !prev), 700);
       } else {
         setDisabled(false);
         setIsShown(true);
@@ -84,33 +90,27 @@ const OpenBoxesPage = () => {
 
   const [isAllClaimed, setIsAllClaimed] = useState<boolean>(false);
 
-  const preCheck = () => {
-    const data = JSON.parse(localStorage.getItem(RUFFLE_TOKENS) || '[]') as TUserRuffle[];
-    const lastRuffleTokens = data.at(-1)?.tokens;
-    const text = `Open boxes - ${(lastRuffleTokens?.length || 1) % 3}/3`;
+  const preCheckText = useCallback(() => {
+    const text = `Open boxes - ${step}/3`;
     setWithText(text);
-    if (
-      lastRuffleTokens &&
-      lastRuffleTokens.length &&
-      lastRuffleTokens.length % 3 === 0 &&
-      lastRuffleTokens.splice(-3).every(token => token.isOpened)
-    ) {
+  }, [step]);
+
+  const preCheck = useCallback(() => {
+    preCheckText();
+    if (step === 4) {
       setIsAllClaimed(true);
       setWithText(false);
-    } else if (lastRuffleTokens?.at(-1)?.isOpened) {
-      setIsBgChanged(true);
-      setIsOpened(true);
-    } else {
-      console.log(lastRuffleTokens?.at(-1));
+      return false;
     }
-  };
+    return true;
+  }, [step]);
 
   const openHandlerClick = () => {
     openHandler({ withoutPreCheck: false });
   };
 
   useEffect(() => {
-    preCheck();
+    preCheckText();
   }, []);
 
   useEffect(() => {
@@ -140,12 +140,9 @@ const OpenBoxesPage = () => {
             <div
               style={{ display: 'flex', width: '100%', alignItems: 'center', justifyContent: 'center', gap: '10px' }}
             >
-              {userRuffles
-                .at(-1)
-                ?.tokens.splice(-3)
-                .map(tokens => (
-                  <img src={tagToRewardedImage[tokens.tag]} style={{ width: '100px', aspectRatio: '1/1' }} />
-                ))}
+              {claimedTokenstags.map(tokens => (
+                <img src={tagToRewardedImage[tokens]} style={{ width: '100px', aspectRatio: '1/1' }} />
+              ))}
             </div>
             <div className={stylePage.btns}>
               <button className={stylePage.button} onClick={() => setRoute('/offers')}>
@@ -170,7 +167,7 @@ const OpenBoxesPage = () => {
           <div className={styles.logo_block}>
             {isBgChanged ? (
               <img
-                src={tagToBigImage[userRuffles.at(-1)?.tokens.at(-1)?.tag || '']}
+                src={tagToBigImage[claimedTokenstags.at(-1) || '']}
                 alt={'tag'}
                 className={clsx(styles.logo_image, stylePage.appear_token)}
               />
@@ -190,7 +187,7 @@ const OpenBoxesPage = () => {
           </div>
           <div />
           <div className={stylePage.btns}>
-            {isBgChanged ? <RewardTag type={userRuffles.at(-1)?.tokens.at(-1)?.tag || 'utnft'} /> : null}
+            {isBgChanged ? <RewardTag type={claimedTokenstags.at(-1) || 'utnft'} /> : null}
             <button
               className={stylePage.button}
               onClick={!isBgChanged ? clickHandler : openHandlerClick}
